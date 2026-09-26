@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Analizador de Excel</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #1a0505 0%, #2b0a0a 100%);
+        color: #ffe8e8;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 40px 20px;
+    }
+
+    .panel {
+        background: rgba(80, 10, 10, 0.4);
+        border: 2px solid #c41e3a;
+        border-radius: 16px;
+        padding: 32px;
+        width: 100%;
+        max-width: 700px;
+        box-shadow: 0 0 30px rgba(196, 30, 58, 0.2);
+    }
+
+    h1 {
+        margin-bottom: 24px;
+        text-align: center;
+        color: #ff4d5e;
+        text-shadow: 0 0 12px rgba(255, 77, 94, 0.5);
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    input[type="file"] {
+        padding: 10px;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid #c41e3a;
+        border-radius: 8px;
+        color: #ffe8e8;
+    }
+
+    button {
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        background: #c41e3a;
+        color: #fff2e0;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover { background: #a3182f; }
+
+    .resultado {
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(196, 30, 58, 0.4);
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    .fila {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(196, 30, 58, 0.2);
+        color: #fff2e0;
+    }
+
+    .error { color: #ff8080; }
+
+    .tabla-datos h3 {
+        color: #ffcf7a;
+        margin: 20px 0 8px;
+        font-size: 15px;
+    }
+
+    table.excel {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+        font-size: 13px;
+    }
+
+    table.excel th, table.excel td {
+        border: 1px solid rgba(196, 30, 58, 0.4);
+        padding: 6px 10px;
+        text-align: left;
+        color: #ffe8e8;
+    }
+
+    table.excel th {
+        background: rgba(196, 30, 58, 0.5);
+        color: #fff2e0;
+    }
+
+    table.excel tr:nth-child(even) td {
+        background: rgba(0,0,0,0.2);
+    }
+</style>
+</head>
+<body>
+    <div class="panel">
+        <h1>🍒 Analizador de Excel 🎀</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="archivo1" accept=".xlsx" placeholder="Excel 1">
+            <input type="file" name="archivo2" accept=".xlsx" placeholder="Excel 2">
+            <button type="submit">Comparar</button>
+        </form>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        {% if resultado %}
+        <div class="resultado">
+            <div class="fila"><span>Archivo 1 ({{ resultado.archivo1 }}):</span><span>${{ resultado.datos1.total }}</span></div>
+            <div class="fila"><span>Archivo 2 ({{ resultado.archivo2 }}):</span><span>${{ resultado.datos2.total }}</span></div>
+            <div class="fila"><span>Diferencia:</span><span>${{ resultado.diferencia }} ({{ resultado.variacion }}%)</span></div>
+        </div>
+
+        <a href="/exportar-pdf"><button style="margin-top: 12px;">📄 Descargar PDF</button></a>
+
+        <div class="tabla-datos">
+            <h3>📋 {{ resultado.archivo1 }}</h3>
+            <table class="excel">
+                <tr>{% for col in resultado.datos1.columnas %}<th>{{ col }}</th>{% endfor %}</tr>
+                {% for fila in resultado.datos1.filas %}
+                <tr>{% for col in resultado.datos1.columnas %}<td>{{ fila[col] }}</td>{% endfor %}</tr>
+                {% endfor %}
+            </table>
+
+            <h3>📋 {{ resultado.archivo2 }}</h3>
+            <table class="excel">
+                <tr>{% for col in resultado.datos2.columnas %}<th>{{ col }}</th>{% endfor %}</tr>
+                {% for fila in resultado.datos2.filas %}
+                <tr>{% for col in resultado.datos2.columnas %}<td>{{ fila[col] }}</td>{% endfor %}</tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
